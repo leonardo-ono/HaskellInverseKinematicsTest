@@ -35,10 +35,10 @@ main = play window background fps initialState render handleInput update
     where   initialState = ((0, 0), [(x * 40, x * 40) | x <- [0..6]])
             window = InWindow "Haskell Inverse Kinematics Test" (800, 600) (100, 100)
             background = white
-            render (target, points) = pictures [line points]
+            render (target, points) = line points
             fps = 60
 
-            handleInput (EventMotion (x, y)) (_, p) = ((x, y), p)
+            handleInput (EventMotion m) (_, p) = (m, p)
             handleInput _ x = x
 
             --update seconds (target, points) = (target, reverse $ ik (reverse $ ik points target) (0, 0))
