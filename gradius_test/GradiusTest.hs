@@ -23,21 +23,15 @@ main = do
             fps = 60
             initialState = ((0, 0), [(x * 4, x * 4) | x <- [0..30]])
 
-            render background ship optionPowerUp (target, points) = pictures 
-                [ background
-                , color white $ line points
-                , translate x3 y3 $ scale 2 2 $ optionPowerUp
-                , translate x2 y2 $ scale 2 2 $ optionPowerUp
-                , translate x1 y1 $ scale 2 2 $ optionPowerUp
-                , translate x0 y0 $ scale 2 2 $ ship]
-                where   (x0, y0) = points !! 0
-                        (x1, y1) = points !! 10
-                        (x2, y2) = points !! 20
-                        (x3, y3) = points !! 30
+            render background ship optionPowerUp (target, points) = pictures $
+                [ background, color black $ line points] ++
+                [ uncurry translate (points !! index) $ scale 2 2 $ sprite
+                    | (index, sprite) <- [  (30, optionPowerUp), 
+                                            (20, optionPowerUp), 
+                                            (10, optionPowerUp), 
+                                            (0, ship) ] ]
 
             handleInput (EventMotion (x, y)) (_, p) = ((x + 20, y + 20), p)
             handleInput _ x = x
 
             update seconds (target, points) = (target, ik points target)
-
-            
