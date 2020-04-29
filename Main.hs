@@ -22,26 +22,30 @@ import Graphics.Gloss.Interface.Pure.Game
 import Graphics.Gloss.Data.Vector
 import qualified Graphics.Gloss.Data.Point.Arithmetic as PA
 
-ik :: [Point] -> Point -> [Point]
-ik [_] target = [target]
-ik (x:xs) target = target : ik xs newTarget
+ik :: Float -> [Point] -> Point -> [Point]
+ik _ [_] target = [target]
+ik fixedSegmentSize (x:xs) target = target : ik fixedSegmentSize xs newTarget
     where   secondPoint = head xs
-            distance = magV $ x PA.- secondPoint
-            direction = distance PA.* (normalizeV $ secondPoint PA.- target)
+            direction = fixedSegmentSize PA.* (normalizeV $ secondPoint PA.- target)
             newTarget = target PA.+ direction
 
 main :: IO ()
 main = play window background fps initialState render handleInput update
-    where   initialState = ((0, 0), [(x * 40, x * 40) | x <- [0..6]])
-            window = InWindow "Haskell Inverse Kinematics Test" (800, 600) (100, 100)
+    where   window = InWindow "Haskell Inverse Kinematics Test" (800, 600) (100, 100)
             background = white
-            render (target, points) = line points
             fps = 60
 
-            handleInput (EventMotion m) (_, p) = (m, p)
-            handleInput _ x = x
+            segmentSize = 40
+            initialState = ((0, 0), replicate 7 (1, 1))
 
-            --update seconds (target, points) = (target, reverse $ ik (reverse $ ik points target) (0, 0))
-            update seconds (target, points) = (target, ik points target)
+            render (_, points) = line points
+
+            handleInput (EventMotion m) (_, p) = (m, p)
+            handleInput _ state = state
+
+            --update seconds (target, points) = (target, 
+            --    reverse $ ik segmentSize (reverse $ ik segmentSize points target) (0, 0))
+
+            update seconds (target, points) = (target, ik segmentSize points target)
 
             
